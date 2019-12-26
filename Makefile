@@ -4,6 +4,8 @@
 #
 #	Modified by: Thanos Paraskevas
 #							 athanasps <athanasps@ece.auth.gr>
+#							 Doinakis Michail
+#							 doinakis <doinakis@ece.auth.gr>
 # Original:
 # Author: Dimitris Floros <fcdimitr@auth.gr>
 #
@@ -16,6 +18,11 @@
 # 'make lib'	build the libraries .a
 # 'make clean'  removes all .o and executable files
 #
+# 					*
+#					 ***
+# 				*****
+#				 *******
+# 				 |_|
 
 # define the shell to bash
 SHELL := /bin/bash
