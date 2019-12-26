@@ -6,13 +6,15 @@ int main(){
   int k = 1;
   int n = 517;
   double *w = (double *)malloc(5 * 5 * sizeof(double));
+  if(w == NULL) exit(EXIT_FAILURE);
   int *G = (int *)malloc(n * n * sizeof(int));
+  if(G == NULL) exit(EXIT_FAILURE);
   size_t size;
 
 
   FILE *fp = fopen("conf-init.bin", "rb");
   size = fread(G, sizeof(int), n * n, fp);
-  if(size!=n*n) exit(1);
+  if(size!=n*n) exit(EXIT_FAILURE);
   fclose(fp);
   // for(int i = 0; i < 4; i++){
   //   for(int j = 0; j < 4; j++){
@@ -38,14 +40,14 @@ int main(){
   int *test = (int *)malloc(n * n * sizeof(int));
   fp = fopen("conf-1.bin", "rb");
   size = fread(test, sizeof(int), n * n, fp);
-  if(size!=n*n) exit(1);
+  if(size!=n*n) exit(EXIT_FAILURE);
   fclose(fp);
 
   for(int i = 0; i < n; i++){
     for(int j = 0; j < n; j++){
       if (G(i,j) != test(i,j)) {
         printf("WRONG at (%d,%d)\n", i, j);
-        // exit(1);
+        exit(EXIT_FAILURE);
       }
     }
   }
