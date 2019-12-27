@@ -2,17 +2,21 @@
 #include <stdlib.h>
 #include "ising.h"
 
-int main(){
+int main(int argc, char *argv[]){
+
   int k = 1;
   int n = 517;
+
   double *w = (double *)malloc(5 * 5 * sizeof(double));
   if(w == NULL) exit(EXIT_FAILURE);
+
   int *G = (int *)malloc(n * n * sizeof(int));
   if(G == NULL) exit(EXIT_FAILURE);
+
   size_t size;
 
 
-  FILE *fp = fopen("conf-init.bin", "rb");
+  FILE *fp = fopen("inc/conf-init.bin", "rb");
   size = fread(G, sizeof(int), n * n, fp);
   if(size!=n*n) exit(EXIT_FAILURE);
   fclose(fp);
@@ -38,7 +42,7 @@ int main(){
   ising(G, w, k, n);
 
   int *test = (int *)malloc(n * n * sizeof(int));
-  fp = fopen("conf-1.bin", "rb");
+  fp = fopen("inc/conf-1.bin", "rb");
   size = fread(test, sizeof(int), n * n, fp);
   if(size!=n*n) exit(EXIT_FAILURE);
   fclose(fp);
