@@ -28,10 +28,10 @@
 SHELL := /bin/bash
 
 # define the C/C++ compiler to use,default here is clang
-NVCC = nvcc
+CC = gcc-7
 
 # define compile-time flags
-CFLAGS =
+CFLAGS = -O3 -Wall
 
 # define any directories containing header files
 INCLUDES = -Iinc
@@ -49,14 +49,14 @@ LIBS = -lm
 SRC = ising
 
 # define the different possible executables
-TYPES = cuda_v1
+TYPES = sequential
 
 # define the executable file name
 MAIN = main
 
 # define paths to .a files
 LIBDIR = ./lib
-# and .cu files
+# and .c files
 SRCDIR = ./src
 
 # call everytime
@@ -66,14 +66,18 @@ all: $(addprefix $(MAIN)_, $(TYPES))
 
 lib: $(addprefix $(LIBDIR)/, $(addsuffix .a, $(addprefix $(SRC)_, $(TYPES))))
 
-$(MAIN)_%: $(MAIN).cu $(LIBDIR)/$(SRC)_%.a
-	$(NVCC) $(CFLAGS) $(INCLUDES) -o $@ $^ $(LDFLAGS) $(LIBS)
+$(MAIN)_%: $(MAIN).c $(LIBDIR)/$(SRC)_%.a
+	$(CC) $(CFLAGS) $(INCLUDES) -o $@ $^ $(LDFLAGS) $(LIBS)
+
+# this is a suffix replacement rule for building .o's from .c's
+# it uses automatic variables $<: the name of the prerequisite of
+# the rule(a .cpp file) and $@: the name of the target of the rule (a .o file)
 
 $(LIBDIR)/$(SRC)_%.a: $(LIBDIR)/$(SRC)_%.o
 	ar rcs $@ $<
 
-$(LIBDIR)/$(SRC)_$(TYPES).o: $(SRCDIR)/$(SRC)_$(TYPES).cu
-	$(NVCC) $(CFLAGS) $(INCLUDES) -o $@ -c $<
+$(LIBDIR)/$(SRC)_$(TYPES).o: $(SRCDIR)/$(SRC)_$(TYPES).c
+	$(CC) $(CFLAGS) $(INCLUDES) -o $@ -c $<
 
 clean:
 	$(RM) $(LIBDIR)/*.o *~ $(addprefix $(MAIN)_, $(TYPES)) $(LIBDIR)/$(SRC)_*.a

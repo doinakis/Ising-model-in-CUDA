@@ -12,12 +12,10 @@
 #ifndef ISING_H
 #define ISING_H
 
-// auxiliary definitions for row major access
-#define new_G(i,j)    *(new_G + (i) * n + (j))
-#define G(i,j)        *(G + (i) * n + (j))
-#define w(i,j)        *(w + (i) * 5 + (j))
-#define result(i,j)   *(result + (i) * n + (j))
-#define test(i,j)     *(test + (i) * n + (j))
+#define new_G(i,j)  *(new_G + (i) * n + (j))
+#define G(i,j)      *(G + (i) * n + (j))
+#define w(i,j)      *(w + (i) * 5 + (j))
+#define test(i,j)   *(test + (i) * n + (j))
 
 //https://superuser.com/questions/125376/how-do-i-compare-binary-files-in-linux
 
@@ -31,7 +29,6 @@
 
   NOTE: Both matrices G and w are stored in row-major format.
 */
-__global__
-void ising(int *G, int *new_G, double *w, int k, int n);
+void ising(int *G, double *w, int k, int n);
 
 #endif

@@ -23,6 +23,8 @@
 
   NOTE: Both matrices G and w are stored in row-major format.
 */
+
+
 void ising(int *G, double *w, int k, int n){
 
   // track initial pointer of G to write result back
@@ -53,9 +55,6 @@ void ising(int *G, double *w, int k, int n){
           }
         }
 
-        // for testing purposes
-        //printf("weighted sum of (%d,%d): %1.20f\n", ip, jp, weighted_sum);
-
         // precision to account for floating point errors
         double epsilon = 1e-4;
 
@@ -73,6 +72,7 @@ void ising(int *G, double *w, int k, int n){
           new_G(ip,jp) = G(ip,jp);
 
         }
+        new_G(ip,jp) = weighted_sum;
       }
     }
 
