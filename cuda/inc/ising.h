@@ -31,7 +31,10 @@
 
   NOTE: Both matrices G and w are stored in row-major format.
 */
+
+void ising(int *G, double *w, int k, int n);
+
 __global__
-void ising(int *G, int *new_G, double *w, int k, int n);
+void ising_cuda(int *G, int *new_G, double *w, int n);
 
 #endif

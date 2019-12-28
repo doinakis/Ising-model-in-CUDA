@@ -72,7 +72,7 @@ void ising(int *G, double *w, int k, int n){
           new_G(ip,jp) = G(ip,jp);
 
         }
-        new_G(ip,jp) = weighted_sum;
+
       }
     }
 

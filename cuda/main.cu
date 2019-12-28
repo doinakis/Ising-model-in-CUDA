@@ -32,7 +32,7 @@ int main(int argc, char *argv[]){
   };
   for(int i = 0; i < 5; i++){
     for(int j = 0; j < 5; j++){
-      w(i,j) = 1;//a[i][j];
+      w(i,j) = a[i][j];
     }
   }
 
@@ -48,23 +48,13 @@ int main(int argc, char *argv[]){
   if(size!=n*n) exit(EXIT_FAILURE);
   fclose(fp);
 
-  for(int i=0;i<10;i++){
-    for(int j=0;j<10;j++){
-      printf("%2d\t", G(i,j));
-    }
-    printf("\n");
-  }
-
-  printf("\n\n");
 
   // DEVICE ALLOCATION
-  int *dev_G, *dev_new_G;
+  int *dev_G;
   double *dev_w;
-
 
   cudaMalloc(&dev_G, n*n*sizeof(int));
   cudaMalloc(&dev_w, 5*5*sizeof(double));
-  cudaMalloc(&dev_new_G, n*n*sizeof(int));
 
   // tranfer data to device
   cudaMemcpy(dev_G, G, n*n*sizeof(int), cudaMemcpyHostToDevice);
@@ -75,22 +65,32 @@ int main(int argc, char *argv[]){
   // ========== k = 1 ==========
   k = 1;
   flag = 0;
-//  uint3 threadsPerBlock= make_uint3();
-  uint3 blocksPerGrid = make_uint3(517,517,1);
 
-  //calling kernel function
-  ising<<<blocksPerGrid,1>>>(dev_G, dev_new_G, dev_w, k, n);
-  cudaDeviceSynchronize();
+  // call ising function
+  ising(dev_G, dev_w, k, n);
 
   cudaMemcpy(G, dev_G, n*n*sizeof(int), cudaMemcpyDeviceToHost);
 
-  for(int i=0;i<20;i++){
-    for(int j=0;j<10;j++){
-      printf("%2d\t", G(i,j));
+  int *test = (int *)malloc(n * n * sizeof(int));
+  fp = fopen("inc/conf-1.bin", "rb");
+  size = fread(test, sizeof(int), n * n, fp);
+  if(size!=n*n) exit(EXIT_FAILURE);
+  fclose(fp);
+
+  for(int i = 0; i < n; i++){
+    for(int j = 0; j < n; j++){
+      if (G(i,j) != test(i,j)) {
+        printf("k = %d - WRONG\n", k);
+        flag = 1;
+        break;
+      }
     }
-    printf("\n");
+    if(flag)
+      break;
   }
 
+  if(!flag)
+    printf("k = %d - CORRECT\n", k);
 
   return 0;
 
