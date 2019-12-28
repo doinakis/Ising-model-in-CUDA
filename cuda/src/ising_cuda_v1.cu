@@ -14,8 +14,19 @@
 #include "ising.h"
 
 
+//! Ising model evolution KERNEL
+/*!
+
+  \param G        Spins on the square lattice                     [n-by-n]
+  \param new_G    Spins on the square lattice at next time step   [n-by-n]
+  \param w        Weight matrix                                   [5-by-5]
+  \param n        Number of lattice points per dim                [scalar]
+
+  NOTE: Both matrices G and w are stored in row-major format.
+*/
+
 __global__
-void ising_cuda(int *G, int *new_G, double *w, int n){
+void ising_kernel(int *G, int *new_G, double *w, int n){
 
   int ip = blockIdx.x*blockDim.x + threadIdx.x;
   int jp = blockIdx.y*blockDim.y + threadIdx.y;
@@ -57,6 +68,7 @@ void ising_cuda(int *G, int *new_G, double *w, int n){
   }
 }
 
+
 //! Ising model evolution
 /*!
 
@@ -68,32 +80,46 @@ void ising_cuda(int *G, int *new_G, double *w, int n){
   NOTE: Both matrices G and w are stored in row-major format.
 */
 
+// === This is a WRAPPER for calling the cuda kernel ===
+
 void ising(int *G, double *w, int k, int n){
 
-  int  *dev_new_G;
+  // DEVICE ALLOCATION
+  int *dev_G, *dev_new_G;
+  double *dev_w;
 
-  // track initial pointer of G to write result back
-  int *result = G;
-
+  cudaMalloc(&dev_G, n*n*sizeof(int));
   cudaMalloc(&dev_new_G, n*n*sizeof(int));
+  cudaMalloc(&dev_w, 5*5*sizeof(double));
+
+  // tranfer data to device
+  cudaMemcpy(dev_G, G, n*n*sizeof(int), cudaMemcpyHostToDevice);
+  cudaMemcpy(dev_w, w, 5*5*sizeof(double), cudaMemcpyHostToDevice);
+
+
+  // grid and blocks dimensions
+  uint3 threadsPerBlock= make_uint3(1,1,1);
+  uint3 blocksPerGrid = make_uint3(n,n,1);
 
   // for every iteration
   for(int h = 0; h < k; h++){
 
-    uint3 threadsPerBlock= make_uint3(1,1,1);
-    uint3 blocksPerGrid = make_uint3(517,517,1);
-
     // call kernel function
-    ising_cuda<<<blocksPerGrid, threadsPerBlock>>>(G, dev_new_G, w, n);
+    ising_kernel<<<blocksPerGrid, threadsPerBlock>>>(dev_G, dev_new_G, dev_w, n);
 
     // swap pointers
-    int *temp = G;
-    G = dev_new_G;
+    int *temp = dev_G;
+    dev_G = dev_new_G;
     dev_new_G = temp;
 
   }
 
   // copy result back to original array
-  cudaMemcpy(result, dev_new_G, n*n, cudaMemcpyDeviceToDevice);
+  cudaMemcpy(G, dev_G, n*n*sizeof(int), cudaMemcpyDeviceToHost);
+
+  // free device arrays
+  cudaFree(dev_G);
+  cudaFree(dev_new_G);
+  cudaFree(dev_w);
 
 }

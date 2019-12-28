@@ -23,16 +23,16 @@ int main(int argc, char *argv[]){
   double *w = (double *)malloc(5 * 5 * sizeof(double));
   if(w == NULL) exit(EXIT_FAILURE);
 
-  // double a[5][5] = {
-  //  {0.004, 0.016, 0.026, 0.016, 0.004} ,
-  //  {0.016, 0.071, 0.117, 0.071, 0.016} ,
-  //  {0.026, 0.117, 0.000, 0.117, 0.026} ,
-  //  {0.016, 0.071, 0.117, 0.071, 0.016} ,
-  //  {0.004, 0.016, 0.026, 0.016, 0.004}
-  // };
+  double a[5][5] = {
+   {0.004, 0.016, 0.026, 0.016, 0.004} ,
+   {0.016, 0.071, 0.117, 0.071, 0.016} ,
+   {0.026, 0.117, 0.000, 0.117, 0.026} ,
+   {0.016, 0.071, 0.117, 0.071, 0.016} ,
+   {0.004, 0.016, 0.026, 0.016, 0.004}
+  };
   for(int i = 0; i < 5; i++){
     for(int j = 0; j < 5; j++){
-      w(i,j) = 1;//a[i][j];
+      w(i,j) = a[i][j];
     }
   }
 
@@ -70,6 +70,27 @@ int main(int argc, char *argv[]){
     }
     printf("\n");
   }
+
+  int *test = (int *)malloc(n * n * sizeof(int));
+  fp = fopen("inc/conf-1.bin", "rb");
+  size = fread(test, sizeof(int), n * n, fp);
+  if(size!=n*n) exit(EXIT_FAILURE);
+  fclose(fp);
+
+  for(int i = 0; i < n; i++){
+    for(int j = 0; j < n; j++){
+      if (G(i,j) != test(i,j)) {
+        printf("k = %d - WRONG\n", k);
+        flag = 1;
+        break;
+      }
+    }
+    if(flag)
+      break;
+  }
+
+  if(!flag)
+    printf("k = %d - CORRECT\n", k);
 
 
   return 0;

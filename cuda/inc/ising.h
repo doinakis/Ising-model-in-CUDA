@@ -19,7 +19,20 @@
 #define result(i,j)   *(result + (i) * n + (j))
 #define test(i,j)     *(test + (i) * n + (j))
 
-//https://superuser.com/questions/125376/how-do-i-compare-binary-files-in-linux
+
+//! Ising model evolution KERNEL
+/*!
+
+  \param G        Spins on the square lattice                     [n-by-n]
+  \param new_G    Spins on the square lattice at next time step   [n-by-n]
+  \param w        Weight matrix                                   [5-by-5]
+  \param n        Number of lattice points per dim                [scalar]
+
+  NOTE: Both matrices G and w are stored in row-major format.
+*/
+
+void ising(int *G, double *w, int k, int n);
+
 
 //! Ising model evolution
 /*!
@@ -32,9 +45,9 @@
   NOTE: Both matrices G and w are stored in row-major format.
 */
 
-void ising(int *G, double *w, int k, int n);
+// === This is a WRAPPER for calling the cuda kernel ===
 
 __global__
-void ising_cuda(int *G, int *new_G, double *w, int n);
+void ising_kernel(int *G, int *new_G, double *w, int n);
 
 #endif

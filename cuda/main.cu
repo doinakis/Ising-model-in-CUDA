@@ -1,5 +1,5 @@
 /*
-*Sequential Main function with tester
+*Cuda Main function with tester
 *Doinakis Michail && Paraskevas Thanos
 *e-mail: doinakis@ece.auth.gr && athanasps@ece.auth.gr
        *
@@ -18,8 +18,7 @@ int main(int argc, char *argv[]){
   int k, n = 517;
   int flag;
 
-  // HOST ALLOCATION
-  // Allocate weights array
+  // allocate weights array
   double *w = (double *)malloc(5 * 5 * sizeof(double));
   if(w == NULL) exit(EXIT_FAILURE);
 
@@ -36,7 +35,7 @@ int main(int argc, char *argv[]){
     }
   }
 
-  // Allocate spins array
+  // allocate spins array
   int *G = (int *)malloc(n * n * sizeof(int));
   if(G == NULL) exit(EXIT_FAILURE);
 
@@ -48,29 +47,14 @@ int main(int argc, char *argv[]){
   if(size!=n*n) exit(EXIT_FAILURE);
   fclose(fp);
 
-
-  // DEVICE ALLOCATION
-  int *dev_G;
-  double *dev_w;
-
-  cudaMalloc(&dev_G, n*n*sizeof(int));
-  cudaMalloc(&dev_w, 5*5*sizeof(double));
-
-  // tranfer data to device
-  cudaMemcpy(dev_G, G, n*n*sizeof(int), cudaMemcpyHostToDevice);
-  cudaMemcpy(dev_w, w, 5*5*sizeof(double), cudaMemcpyHostToDevice);
-
-
   // ========== TESTER ==========
   // ========== k = 1 ==========
   k = 1;
   flag = 0;
 
-  // call ising function
-  ising(dev_G, dev_w, k, n);
+  ising(G, w, k, n);
 
-  cudaMemcpy(G, dev_G, n*n*sizeof(int), cudaMemcpyDeviceToHost);
-
+  // load expected state of spins after k iterations
   int *test = (int *)malloc(n * n * sizeof(int));
   fp = fopen("inc/conf-1.bin", "rb");
   size = fread(test, sizeof(int), n * n, fp);
@@ -91,6 +75,77 @@ int main(int argc, char *argv[]){
 
   if(!flag)
     printf("k = %d - CORRECT\n", k);
+
+
+  // ========== k = 4 ==========
+  k = 4;
+  flag = 0;
+
+  // reload inital state of spins
+  fp = fopen("inc/conf-init.bin", "rb");
+  size = fread(G, sizeof(int), n * n, fp);
+  if(size!=n*n) exit(EXIT_FAILURE);
+  fclose(fp);
+
+  ising(G, w, k, n);
+
+  // load expected state of spins after k iterations
+  fp = fopen("inc/conf-4.bin", "rb");
+  size = fread(test, sizeof(int), n * n, fp);
+  if(size!=n*n) exit(EXIT_FAILURE);
+  fclose(fp);
+
+  for(int i = 0; i < n; i++){
+    for(int j = 0; j < n; j++){
+      if (G(i,j) != test(i,j)) {
+        printf("k = %d - WRONG\n", k);
+        flag = 1;
+        break;
+      }
+    }
+    if(flag)
+      break;
+  }
+
+  if(!flag)
+    printf("k = %d - CORRECT\n", k);
+
+  // ========== k = 11 ==========
+  k = 11;
+  flag = 0;
+
+  // reload inital state of spins
+  fp = fopen("inc/conf-init.bin", "rb");
+  size = fread(G, sizeof(int), n * n, fp);
+  if(size!=n*n) exit(EXIT_FAILURE);
+  fclose(fp);
+
+  ising(G, w, k, n);
+
+  // load expected state of spins after k iterations
+  fp = fopen("inc/conf-11.bin", "rb");
+  size = fread(test, sizeof(int), n * n, fp);
+  if(size!=n*n) exit(EXIT_FAILURE);
+  fclose(fp);
+
+  for(int i = 0; i < n; i++){
+    for(int j = 0; j < n; j++){
+      if (G(i,j) != test(i,j)) {
+        printf("k = %d - WRONG\n", k);
+        flag = 1;
+        break;
+      }
+    }
+    if(flag)
+      break;
+  }
+
+  if(!flag)
+    printf("k = %d - CORRECT\n", k);
+
+  free(G);
+  free(w);
+  free(test);
 
   return 0;
 

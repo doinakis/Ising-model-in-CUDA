@@ -18,7 +18,7 @@ int main(int argc, char *argv[]){
   int k, n = 517;
   int flag;
 
-  // Allocate weights array
+  // allocate weights array
   double *w = (double *)malloc(5 * 5 * sizeof(double));
   if(w == NULL) exit(EXIT_FAILURE);
 
@@ -35,13 +35,13 @@ int main(int argc, char *argv[]){
     }
   }
 
-  // Allocate spins array
+  // allocate spins array
   int *G = (int *)malloc(n * n * sizeof(int));
   if(G == NULL) exit(EXIT_FAILURE);
 
   size_t size;
 
-  //load initial state of spins
+  // load initial state of spins
   FILE *fp = fopen("inc/conf-init.bin", "rb");
   size = fread(G, sizeof(int), n * n, fp);
   if(size!=n*n) exit(EXIT_FAILURE);
@@ -54,6 +54,7 @@ int main(int argc, char *argv[]){
 
   ising(G, w, k, n);
 
+  // load expected state of spins after k iterations
   int *test = (int *)malloc(n * n * sizeof(int));
   fp = fopen("inc/conf-1.bin", "rb");
   size = fread(test, sizeof(int), n * n, fp);
@@ -76,17 +77,19 @@ int main(int argc, char *argv[]){
     printf("k = %d - CORRECT\n", k);
 
 
+  // ========== k = 4 ==========
+  k = 4;
+  flag = 0;
+
+  // reload inital state of spins
   fp = fopen("inc/conf-init.bin", "rb");
   size = fread(G, sizeof(int), n * n, fp);
   if(size!=n*n) exit(EXIT_FAILURE);
   fclose(fp);
 
-  // ========== k = 4 ==========
-  k = 4;
-  flag = 0;
-
   ising(G, w, k, n);
 
+  // load expected state of spins after k iterations
   fp = fopen("inc/conf-4.bin", "rb");
   size = fread(test, sizeof(int), n * n, fp);
   if(size!=n*n) exit(EXIT_FAILURE);
@@ -107,17 +110,19 @@ int main(int argc, char *argv[]){
   if(!flag)
     printf("k = %d - CORRECT\n", k);
 
+  // ========== k = 11 ==========
+  k = 11;
+  flag = 0;
+
+  // reload inital state of spins
   fp = fopen("inc/conf-init.bin", "rb");
   size = fread(G, sizeof(int), n * n, fp);
   if(size!=n*n) exit(EXIT_FAILURE);
   fclose(fp);
 
-  // ========== k = 11 ==========
-  k = 11;
-  flag = 0;
-
   ising(G, w, k, n);
 
+  // load expected state of spins after k iterations
   fp = fopen("inc/conf-11.bin", "rb");
   size = fread(test, sizeof(int), n * n, fp);
   if(size!=n*n) exit(EXIT_FAILURE);
@@ -137,6 +142,10 @@ int main(int argc, char *argv[]){
 
   if(!flag)
     printf("k = %d - CORRECT\n", k);
+
+  free(G);
+  free(w);
+  free(test);
 
   return 0;
 
