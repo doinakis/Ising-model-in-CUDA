@@ -49,7 +49,7 @@ LIBS = -lm
 SRC = ising
 
 # define the different possible executables
-TYPES = cuda_v1
+TYPES = cuda_v1 cuda_v2 cuda_v3
 
 # define the executable file name
 MAIN = main
@@ -72,7 +72,7 @@ $(MAIN)_%: $(MAIN).cu $(LIBDIR)/$(SRC)_%.a
 $(LIBDIR)/$(SRC)_%.a: $(LIBDIR)/$(SRC)_%.o
 	ar rcs $@ $<
 
-$(LIBDIR)/$(SRC)_$(TYPES).o: $(SRCDIR)/$(SRC)_$(TYPES).cu
+$(LIBDIR)/$(SRC)_%.o: $(SRCDIR)/$(SRC)_%.cu
 	$(NVCC) $(CFLAGS) $(INCLUDES) -o $@ -c $<
 
 clean:

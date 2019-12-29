@@ -12,6 +12,7 @@
 #ifndef ISING_H
 #define ISING_H
 
+// auxiliary definitions for row major access
 #define new_G(i,j)  *(new_G + (i) * n + (j))
 #define G(i,j)      *(G + (i) * n + (j))
 #define w(i,j)      *(w + (i) * 5 + (j))

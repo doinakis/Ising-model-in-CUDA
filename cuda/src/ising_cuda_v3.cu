@@ -1,5 +1,5 @@
 /*
-*Cuda Implementation #1
+*Cuda Implementation #3
 *Doinakis Michail && Paraskevas Thanos
 *e-mail: doinakis@ece.auth.gr && athanasps@ece.auth.gr
        *
@@ -10,6 +10,8 @@
 */
 
 #include "ising.h"
+#define NUMTHREADS 8
+#define NUMBLOCKS  8
 
 
 //! Ising model evolution KERNEL
@@ -26,44 +28,54 @@
 __global__
 void ising_kernel(int *G, int *new_G, double *w, int n){
 
-  int ip = blockIdx.x*blockDim.x + threadIdx.x;
-  int jp = blockIdx.y*blockDim.y + threadIdx.y;
+  __shared__ double shared_w[25];
 
+  if(threadIdx.x < 5 && threadIdx.y < 5){
+    shared_w(threadIdx.x, threadIdx.y) = w(threadIdx.x, threadIdx.y);
+  }
 
-  if(ip < n && jp < n){
+  int ip0 = blockIdx.x*blockDim.x + threadIdx.x;
+  int jp0 = blockIdx.y*blockDim.y + threadIdx.y;
 
-    // variable for summation of neighbor weighted spins
-    double weighted_sum = 0.0f;
+  __syncthreads();
 
-    // for every neighbor
-    for(int in = -2; in <= 2; in++){
-      for(int jn = -2; jn <= 2; jn++){
+  for(int ip = ip0; ip < n; ip += blockDim.x*gridDim.x){
+    for(int jp = jp0; jp < n; jp += blockDim.y*gridDim.y){
 
-        // add weighted spins
-        weighted_sum += w(in + 2 , jn + 2) * G((ip + in + n) % n, (jp + jn + n) % n);
+      // variable for summation of neighbor weighted spins
+      double weighted_sum = 0.0f;
+
+      // for every neighbor
+      for(int in = -2; in <= 2; in++){
+        for(int jn = -2; jn <= 2; jn++){
+
+          // add weighted spins
+          weighted_sum += shared_w(in + 2 , jn + 2) * G((ip + in + n) % n, (jp + jn + n) % n);
+
+        }
+      }
+
+      // precision to account for floating point errors
+      double epsilon = 1e-4;
+
+      // Update magnetic momment
+      if(weighted_sum > epsilon){
+
+        new_G(ip,jp) = 1;
+
+      }else if(weighted_sum < - epsilon){
+
+        new_G(ip,jp) = -1;
+
+      }else{
+
+        new_G(ip,jp) = G(ip,jp);
 
       }
-    }
-
-    // precision to account for floating point errors
-    double epsilon = 1e-4;
-
-    // Update magnetic momment
-    if(weighted_sum > epsilon){
-
-      new_G(ip,jp) = 1;
-
-    }else if(weighted_sum < - epsilon){
-
-      new_G(ip,jp) = -1;
-
-    }else{
-
-      new_G(ip,jp) = G(ip,jp);
 
     }
-
   }
+
 }
 
 
@@ -82,6 +94,8 @@ void ising_kernel(int *G, int *new_G, double *w, int n){
 
 void ising(int *G, double *w, int k, int n){
 
+  cudaError_t err;
+
   // DEVICE ALLOCATION
   int *dev_G, *dev_new_G;
   double *dev_w;
@@ -96,14 +110,20 @@ void ising(int *G, double *w, int k, int n){
 
 
   // grid and blocks dimensions
-  uint3 threadsPerBlock= make_uint3(1,1,1);
-  uint3 blocksPerGrid = make_uint3(n,n,1);
+  uint3 threadsPerBlock= make_uint3(NUMTHREADS,NUMTHREADS,1);
+  uint3 blocksPerGrid = make_uint3(NUMBLOCKS,NUMBLOCKS,1);
 
   // for every iteration
   for(int h = 0; h < k; h++){
 
     // call kernel function
     ising_kernel<<<blocksPerGrid, threadsPerBlock>>>(dev_G, dev_new_G, dev_w, n);
+
+    err = cudaGetLastError();
+    if( err != cudaSuccess ) {
+      /* something bad happened during launch */
+      printf("Error: %s\n", cudaGetErrorString(err) );
+    }
 
     // swap pointers
     int *temp = dev_G;

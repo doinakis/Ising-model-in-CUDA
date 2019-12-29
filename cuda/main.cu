@@ -9,14 +9,15 @@
       |_|
 */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include "ising.h"
 
 int main(int argc, char *argv[]){
 
   int k, n = 517;
   int flag;
+
+  struct timeval startwtime, endwtime;
+  double totaltime;
 
   // allocate weights array
   double *w = (double *)malloc(5 * 5 * sizeof(double));
@@ -120,7 +121,18 @@ int main(int argc, char *argv[]){
   if(size!=n*n) exit(EXIT_FAILURE);
   fclose(fp);
 
+  // timing call of ising start
+  gettimeofday(&startwtime, NULL);
+
   ising(G, w, k, n);
+
+  // timing call of ising end
+  gettimeofday(&endwtime, NULL);
+
+  totaltime = (double)((endwtime.tv_usec - startwtime.tv_usec)/1.0e6
+          + endwtime.tv_sec - startwtime.tv_sec);
+
+  printf("total time: %f\n", totaltime);
 
   // load expected state of spins after k iterations
   fp = fopen("inc/conf-11.bin", "rb");
