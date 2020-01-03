@@ -28,8 +28,10 @@
 __global__
 void ising_kernel(int *G, int *new_G, double *w, int n){
 
+  // allocate shared memory for weights
   __shared__ double shared_w[25];
 
+  // moving weights to shared memory
   if(threadIdx.x < 5 && threadIdx.y < 5){
     shared_w(threadIdx.x, threadIdx.y) = w(threadIdx.x, threadIdx.y);
   }
@@ -37,6 +39,7 @@ void ising_kernel(int *G, int *new_G, double *w, int n){
   int ip0 = blockIdx.x*blockDim.x + threadIdx.x;
   int jp0 = blockIdx.y*blockDim.y + threadIdx.y;
 
+  // synchronizing threads to prevent false readings
   __syncthreads();
 
   for(int ip = ip0; ip < n; ip += blockDim.x*gridDim.x){
@@ -50,6 +53,7 @@ void ising_kernel(int *G, int *new_G, double *w, int n){
         for(int jn = -2; jn <= 2; jn++){
 
           // add weighted spins
+          // use the mod operator to satisfy the periodic boundary conditions
           weighted_sum += shared_w(in + 2 , jn + 2) * G((ip + in + n) % n, (jp + jn + n) % n);
 
         }

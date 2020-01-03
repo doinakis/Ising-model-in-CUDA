@@ -28,9 +28,11 @@
 __global__
 void ising_kernel(int *G, int *new_G, double *w, int n){
 
+  // initial position of each thread in each block
   int ip0 = blockIdx.x*blockDim.x + threadIdx.x;
   int jp0 = blockIdx.y*blockDim.y + threadIdx.y;
 
+  // using stride to accomodate for bigger dimensions of the problem
   for(int ip = ip0; ip < n; ip += blockDim.x*gridDim.x){
     for(int jp = jp0; jp < n; jp += blockDim.y*gridDim.y){
 
@@ -42,6 +44,7 @@ void ising_kernel(int *G, int *new_G, double *w, int n){
         for(int jn = -2; jn <= 2; jn++){
 
           // add weighted spins
+          // use the mod operator to satisfy the periodic boundary conditions
           weighted_sum += w(in + 2 , jn + 2) * G((ip + in + n) % n, (jp + jn + n) % n);
 
         }

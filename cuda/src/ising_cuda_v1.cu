@@ -26,6 +26,7 @@
 __global__
 void ising_kernel(int *G, int *new_G, double *w, int n){
 
+  // assing a point to every thread (1 thread per block) to match the Ising model lattice
   int ip = blockIdx.x*blockDim.x + threadIdx.x;
   int jp = blockIdx.y*blockDim.y + threadIdx.y;
 
@@ -40,6 +41,7 @@ void ising_kernel(int *G, int *new_G, double *w, int n){
       for(int jn = -2; jn <= 2; jn++){
 
         // add weighted spins
+        // use the mod operator to satisfy the periodic boundary conditions
         weighted_sum += w(in + 2 , jn + 2) * G((ip + in + n) % n, (jp + jn + n) % n);
 
       }

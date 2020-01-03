@@ -48,6 +48,7 @@ int main(int argc, char *argv[]){
   // ========== TESTER ==========
   // ========== k = 1 ==========
   k = 1;
+  // helper variable to stop the iterations if a wrong result is found
   flag = 0;
 
   ising(G, w, k, n);
@@ -59,8 +60,10 @@ int main(int argc, char *argv[]){
   if(size!=n*n) exit(EXIT_FAILURE);
   fclose(fp);
 
+  // for every point
   for(int i = 0; i < n; i++){
     for(int j = 0; j < n; j++){
+      // if the result doesn't match the expected result print WRONG
       if (G(i,j) != test(i,j)) {
         printf("k = %d - WRONG\n", k);
         flag = 1;
@@ -70,7 +73,7 @@ int main(int argc, char *argv[]){
     if(flag)
       break;
   }
-
+  //
   if(!flag)
     printf("k = %d - CORRECT\n", k);
 

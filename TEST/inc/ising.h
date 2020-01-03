@@ -17,8 +17,6 @@
 #define w(i,j)      *(w + (i) * 5 + (j))
 #define test(i,j)   *(test + (i) * n + (j))
 
-//https://superuser.com/questions/125376/how-do-i-compare-binary-files-in-linux
-
 //! Ising model evolution
 /*!
 

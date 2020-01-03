@@ -14,17 +14,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
-#include <time.h>
-#include <sys/time.h>
 
 // auxiliary definitions for row major access
 #define new_G(i,j)  *(new_G + (i) * n + (j))
 #define G(i,j)      *(G + (i) * n + (j))
 #define w(i,j)      *(w + (i) * 5 + (j))
 #define test(i,j)   *(test + (i) * n + (j))
-
-//https://superuser.com/questions/125376/how-do-i-compare-binary-files-in-linux
 
 //! Ising model evolution
 /*!

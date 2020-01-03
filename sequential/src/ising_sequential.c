@@ -9,8 +9,6 @@
       |_|
 */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include "ising.h"
 
 //! Ising model evolution
@@ -47,6 +45,7 @@ void ising(int *G, double *w, int k, int n){
           for(int jn = -2; jn <= 2; jn++){
 
             // add weighted spins
+            // use the mod operator to satisfy the periodic boundary conditions
             weighted_sum += w(in + 2 , jn + 2) * G((ip + in + n) % n , (jp + jn + n) % n);
 
           }
