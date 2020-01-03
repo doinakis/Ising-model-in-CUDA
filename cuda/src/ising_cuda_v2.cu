@@ -10,8 +10,8 @@
 */
 
 #include "ising.h"
-#define NUMTHREADS 32
-#define NUMBLOCKS  5
+#define NUMTHREADS 8
+#define NUMBLOCKS  15
 
 
 //! Ising model evolution KERNEL
