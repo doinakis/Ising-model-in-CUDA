@@ -27,9 +27,6 @@
 
 void ising(int *G, double *w, int k, int n){
 
-  // track initial pointer of G to write result back
-  int *result = G;
-
   // array to write the new state for each iteration
   int *new_G = (int *)malloc(n * n * sizeof(int));
   if(new_G == NULL) exit(EXIT_FAILURE);
@@ -83,8 +80,14 @@ void ising(int *G, double *w, int k, int n){
 
   }
 
-  // copy result back to original array
-  for(int i = 0; i < n * n; i++){
-    result[i] = G[i];
+  /* If pointers have been swapped odd number of times
+     copy result back to original array (new_G points to original G) */
+  if(k % 2 == 1){
+    for(int i = 0; i < n * n; i++){
+      new_G[i] = G[i];
+    }
+    free(G);
+  }else{
+    free(new_G);
   }
 }

@@ -9,14 +9,22 @@
       |_|
 */
 
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
+#include <time.h>
+#include <sys/time.h>
 #include "ising.h"
+
 
 int main(int argc, char *argv[]){
 
-  int k=1, n = 517;
-  int flag;
+  struct timeval startwtime, endwtime;
+  double totaltime;
+
+  int k = atoi(argv[1]);
+  int n = atoi(argv[2]);
 
   // HOST ALLOCATION
   // Allocate weights array
@@ -40,57 +48,25 @@ int main(int argc, char *argv[]){
   int *G = (int *)malloc(n * n * sizeof(int));
   if(G == NULL) exit(EXIT_FAILURE);
 
-  size_t size;
-
-  //load initial state of spins
-  FILE *fp = fopen("inc/conf-init.bin", "rb");
-  size = fread(G, sizeof(int), n * n, fp);
-  if(size!=n*n) exit(EXIT_FAILURE);
-  fclose(fp);
-
-  for(int i=0;i<10;i++){
-    for(int j=0;j<10;j++){
-      printf("%2d\t", G(i,j));
-    }
-    printf("\n");
+  // generate random points
+  for(int i = 0; i < n*n; i++){
+    G[i] = (rand() % 2) * 2 - 1;
   }
 
-  printf("\n\n");
-
-  // ========== TESTER ==========
-  // ========== k = 1 ==========
-  k = 1;
-  flag = 0;
+  // timing call of ising start
+  gettimeofday(&startwtime, NULL);
 
   ising(G, w, k, n);
 
-  for(int i=0;i<20;i++){
-    for(int j=0;j<10;j++){
-      printf("%2d\t", G(i,j));
-    }
-    printf("\n");
-  }
+  // timing call of ising end
+  gettimeofday(&endwtime, NULL);
 
-  int *test = (int *)malloc(n * n * sizeof(int));
-  fp = fopen("inc/conf-1.bin", "rb");
-  size = fread(test, sizeof(int), n * n, fp);
-  if(size!=n*n) exit(EXIT_FAILURE);
+  totaltime = (double)((endwtime.tv_usec - startwtime.tv_usec)/1.0e6
+          + endwtime.tv_sec - startwtime.tv_sec);
+
+  FILE *fp = fopen("results.csv","a");
+  fprintf(fp, "%d,%d,%f\n", n, k, totaltime);
   fclose(fp);
-
-  for(int i = 0; i < n; i++){
-    for(int j = 0; j < n; j++){
-      if (G(i,j) != test(i,j)) {
-        printf("k = %d - WRONG\n", k);
-        flag = 1;
-        break;
-      }
-    }
-    if(flag)
-      break;
-  }
-
-  if(!flag)
-    printf("k = %d - CORRECT\n", k);
 
 
   return 0;

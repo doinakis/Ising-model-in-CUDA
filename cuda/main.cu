@@ -121,18 +121,7 @@ int main(int argc, char *argv[]){
   if(size!=n*n) exit(EXIT_FAILURE);
   fclose(fp);
 
-  // timing call of ising start
-  gettimeofday(&startwtime, NULL);
-
   ising(G, w, k, n);
-
-  // timing call of ising end
-  gettimeofday(&endwtime, NULL);
-
-  totaltime = (double)((endwtime.tv_usec - startwtime.tv_usec)/1.0e6
-          + endwtime.tv_sec - startwtime.tv_sec);
-
-  printf("total time: %f\n", totaltime);
 
   // load expected state of spins after k iterations
   fp = fopen("inc/conf-11.bin", "rb");

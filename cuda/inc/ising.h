@@ -15,8 +15,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <time.h>
-#include <sys/time.h>
 
 // auxiliary definitions for row major access
 #define new_G(i,j)    *(new_G + (i) * n + (j))

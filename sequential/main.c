@@ -9,8 +9,6 @@
       |_|
 */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include "ising.h"
 
 int main(int argc, char *argv[]){
