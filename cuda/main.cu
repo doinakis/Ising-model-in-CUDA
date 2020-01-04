@@ -48,7 +48,7 @@ int main(int argc, char *argv[]){
   // ========== TESTER ==========
   // ========== k = 1 ==========
   k = 1;
-  
+
   // helper variable to stop the iterations if a wrong result is found
   flag = 0;
 
